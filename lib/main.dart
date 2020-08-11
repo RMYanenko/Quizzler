@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzler/quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
@@ -32,22 +33,46 @@ class _QuizPageState extends State<QuizPage> {
 
   void checkAnswer(bool userPickedAnswer) {
     bool correctAnswer = quizBrain.getQuestionAnswer();
-    
-    if (userPickedAnswer == correctAnswer) {
-      print('User got it right!');
-      scoreKeeper.add(Icon(
-        Icons.check,
-        color: Colors.green,
-      ));
-    } else {
-      scoreKeeper.add(Icon(
-        Icons.close,
-        color: Colors.red,
-      ));
-      // nextQuest()
-      print('User got it wrong!');
-    }
+    bool isFinished = quizBrain.isFinished();
+
     setState(() {
+      if (isFinished == true) {
+        print('Yesss');
+        Alert(
+          context: context,
+          type: AlertType.info,
+          title: "TEST IS OVER",
+          desc: "You answered all the questions",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "REPEAT",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              width: 120,
+            )
+          ],
+        ).show();
+        quizBrain.reset();
+        scoreKeeper = [];
+      }
+
+      if (userPickedAnswer == correctAnswer) {
+        print('User got it right!');
+        scoreKeeper.add(Icon(
+          Icons.check,
+          color: Colors.green,
+        ));
+      } else {
+        scoreKeeper.add(Icon(
+          Icons.close,
+          color: Colors.red,
+        ));
+        print('User got it wrong!');
+      }
       quizBrain.nextQuest();
     });
   }
@@ -108,7 +133,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked false.
-               checkAnswer(false);
+                checkAnswer(false);
               },
             ),
           ),
